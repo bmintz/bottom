@@ -61,10 +61,10 @@ class RawClient:
         handle = process(self.raw_handlers, message)
         self.loop.create_task(handle)
 
-    def send_raw(self, message: str) -> None:
+    async def send_raw(self, message: str) -> None:
         if not self.protocol:
             raise RuntimeError("Not connected")
-        self.protocol.write(message)
+        await self.protocol.awrite(message)
 
     async def connect(self) -> None:
         """Open a connection to the defined server."""
@@ -167,18 +167,18 @@ class Client(RawClient):
         super().__init__(host, port, encoding=encoding, ssl=ssl, loop=loop)
         self.raw_handlers.append(rfc2812_handler(self))
 
-    def send(self, command: str, **kwargs: Any) -> None:
+    async def send(self, command: str, **kwargs: Any) -> None:
         """
         Send a message to the server.
 
         .. code-block:: python
 
-            client.send("nick", nick="weatherbot")
-            client.send("privmsg", target="#python", message="Hello, World!")
+            await client.send("nick", nick="weatherbot")
+            await client.send("privmsg", target="#python", message="Hello, World!")
 
         """
         packed_command = pack_command(command, **kwargs).strip()
-        self.send_raw(packed_command)
+        await self.send_raw(packed_command)
 
 
 rfc2812_log = logging.getLogger('bottom.rfc2812_handler')

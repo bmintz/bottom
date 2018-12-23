@@ -34,9 +34,9 @@ Send nick/user/join when connection is established:
 
     @bot.on('CLIENT_CONNECT')
     async def connect(**kwargs):
-        bot.send('NICK', nick=NICK)
-        bot.send('USER', user=NICK,
-                 realname='https://github.com/numberoverzero/bottom')
+        await bot.send('NICK', nick=NICK)
+        await bot.send('USER', user=NICK,
+                       realname='https://github.com/numberoverzero/bottom')
 
         # Don't try to join channels until the server has
         # sent the MOTD, or signaled that there's no MOTD.
@@ -51,7 +51,7 @@ Send nick/user/join when connection is established:
         for future in pending:
             future.cancel()
 
-        bot.send('JOIN', channel=CHANNEL)
+        await bot.send('JOIN', channel=CHANNEL)
 
 
 Respond to ping:
@@ -59,8 +59,8 @@ Respond to ping:
 .. code-block:: python
 
     @bot.on('PING')
-    def keepalive(message, **kwargs):
-        bot.send('PONG', message=message)
+    async def keepalive(message, **kwargs):
+        await bot.send('PONG', message=message)
 
 
 Echo messages (channel and direct messages):
@@ -68,7 +68,7 @@ Echo messages (channel and direct messages):
 .. code-block:: python
 
     @bot.on('PRIVMSG')
-    def message(nick, target, message, **kwargs):
+    async def message(nick, target, message, **kwargs):
         """ Echo all messages """
 
         # Don't echo ourselves
@@ -76,10 +76,10 @@ Echo messages (channel and direct messages):
             return
         # Respond directly to direct messages
         if target == NICK:
-            bot.send("PRIVMSG", target=nick, message=message)
+            await bot.send("PRIVMSG", target=nick, message=message)
         # Channel message
         else:
-            bot.send("PRIVMSG", target=target, message=message)
+            await bot.send("PRIVMSG", target=target, message=message)
 
 
 Connect and run the bot forever:
